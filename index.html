@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BKV Portal</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Audiowide';
+            src: url('Audiowide-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            background-image: url('back01.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #0a0a0a;
+            color: #aaaaaa;
+            font-family: 'Audiowide', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 25, 15, 0.5);
+            border-radius: 0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--terminal-color, #00ff9d);
+            border-radius: 0;
+            border: 1px solid var(--terminal-color-dark, #00aa6d);
+            box-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--terminal-color-dark, #00aa6d);
+        }
+        .security-box.error ::-webkit-scrollbar-thumb {
+            background: #ff0000;
+            border: 1px solid #aa0000;
+            box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+        }
+        .security-box.error ::-webkit-scrollbar-track {
+            background: rgba(25, 0, 0, 0.5);
+        }
+        .portal-container {
+            height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4));
+        }
+        .scanner {
+            width: 100%;
+            height: 4px;
+            background-color: var(--terminal-color, #00ff9d);
+            position: absolute;
+            left: 0;
+            animation: scan 2s infinite;
+            box-shadow: 0 0 10px var(--terminal-color, #00ff9d);
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+        .security-box {
+            border: 2px solid var(--terminal-color, #00ff9d);
+            padding: 0;
+            background-color: rgba(0, 25, 15, 0.7);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+        .security-box.error {
+            border-color: #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            background-color: rgba(25, 0, 0, 0.7);
+        }
+        .typing-effect {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid var(--terminal-color, #00ff9d);
+            animation: typing 3.5s steps(40, end);
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        .subtitle {
+            font-family: 'Audiowide', sans-serif;
+            color: var(--terminal-color-dark, #00aa6d);
+            font-size: 0.65rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            padding-bottom: 5px;
+            width: fit-content;
+            margin: 0 auto;
+        }
+        .hex-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            font-size: 12px;
+            color: rgba(0, 255, 157, 0.1);
+            white-space: pre-wrap;
+            z-index: -1;
+            user-select: none;
+            overflow: hidden;
+        }
+        .login-container {
+            max-width: 400px !important;
+            margin: 0 auto;
+        }
+        #login-interface {
+            padding: 20px;
+        }
+        .terminal-container {
+            display: none;
+            padding: 10px;
+            background-color: rgba(0, 25, 15, 0.9);
+        }
+        /* 终端头部样式 */
+        .terminal-container .d-flex.justify-content-between.align-items-center {
+            background-color: rgba(0, 15, 10, 0.95);
+            margin: -10px -10px 10px -10px;
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(0, 255, 157, 0.3);
+        }
+        .security-box.error .terminal-container .d-flex.justify-content-between.align-items-center {
+            background-color: rgba(15, 0, 0, 0.95);
+            border-bottom: 1px solid rgba(255, 0, 0, 0.3);
+        }
+        .security-box.error .terminal-container {
+            background-color: rgba(25, 0, 0, 0.9);
+        }
+        .terminal {
+            background-color: rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--terminal-color, #00ff9d);
+            border-radius: 5px;
+            padding: 10px;
+            height: 500px;
+            overflow-y: auto;
+            margin-top: 10px;
+            font-family: 'Audiowide', sans-serif;
+            color: #aaaaaa;
+        }
+        .terminal-line {
+            margin-bottom: 5px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-size: 16px;
+        }
+        /* 终端文字颜色类 */
+        .terminal-color-green { color: #00ff9d; }
+        .terminal-color-red { color: #ff0000; }
+        .terminal-color-yellow { color: #ffff00; }
+        .terminal-color-orange { color: #ffaa00; }
+        .terminal-color-blue { color: #00aaff; }
+        .terminal-color-purple { color: #aa00ff; }
+        .terminal-color-gray { color: #aaaaaa; }
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: var(--terminal-color, #00ff9d);
+            outline: none;
+            font-family: 'Audiowide', sans-serif;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+            font-size: 16px;
+        }
+        .prompt {
+            color: var(--terminal-color, #00ff9d);
+            margin-right: 5px;
+            font-family: 'Audiowide', sans-serif;
+            flex-shrink: 0;
+        }
+        /* 登录表单样式 */
+        .form-control {
+            background: transparent !important;
+            border: none !important;
+            border-bottom: 1px solid var(--terminal-color, #00ff9d) !important;
+            border-radius: 0 !important;
+            color: var(--terminal-color, #00ff9d) !important;
+            outline: none !important;
+            box-shadow: none !important;
+            padding: 0.375rem 0 !important;
+            font-family: 'Audiowide', sans-serif !important;
+            transition: all 0.3s ease !important;
+        }
+        .form-control:focus {
+            background: rgba(0, 255, 157, 0.05) !important;
+            box-shadow: none !important;
+            border-color: var(--terminal-color, #00ff9d) !important;
+            border-bottom-width: 2px !important;
+        }
+        .form-label {
+            color: var(--terminal-color, #00ff9d) !important;
+            font-size: 0.8rem !important;
+            margin-bottom: 0.25rem !important;
+            letter-spacing: 1px !important;
+        }
+        /* 错误状态样式覆盖 */
+        .security-box.error .terminal-input,
+        .security-box.error .prompt,
+        .security-box.error .btn-success,
+        .security-box.error .text-success,
+        .security-box.error label,
+        .security-box.error h1,
+        .security-box.error #status,
+        .security-box.error .form-control,
+        .security-box.error .mb-2,
+        .security-box.error .subtitle {
+            color: #ff0000 !important;
+            border-color: #ff0000 !important;
+        }
+        .security-box.error .progress-bar {
+            background-color: #ff0000 !important;
+        }
+        .security-box.error .scanner {
+            background-color: #ff0000 !important;
+            box-shadow: 0 0 10px #ff0000;
+        }
+        .security-box.error .btn-success {
+            background-color: #ff0000 !important;
+            color: white !important;
+        }
+        .security-box.error .form-control {
+            background-color: rgba(0, 0, 0, 0.2) !important;
+        }
+        .countdown {
+            font-size: 24px;
+            text-align: center;
+            color: #ff0000;
+            display: none;
+            font-family: 'Audiowide', sans-serif;
+        }
+        .access-denied {
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+        .access-denied h2 {
+            color: #ff0000;
+            margin-bottom: 5px;
+            font-family: 'Audiowide', sans-serif;
+        }
+        .access-denied p {
+            color: #ff0000;
+            font-size: 12px;
+            margin: 0;
+            margin-bottom: 5px;
+            font-family: 'Audiowide', sans-serif;
+        }
+        /* 全局字体强制 */
+        .form-label, .form-control, button, input, p, h1, h2, h3, h4, h5, h6, span {
+            font-family: 'Audiowide', sans-serif !important;
+        }
+        /* 服务状态样式 */
+        #status-text {
+            font-family: 'Audiowide', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            transition: color 0.3s ease;
+        }
+        .status-down {
+            color: #ff0000 !important;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        .service-status-message {
+            font-family: 'Audiowide', sans-serif;
+            font-size: 0.8rem;
+            color: var(--terminal-color-dark, #00aa6d);
+            text-align: center;
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background-color: rgba(0, 25, 15, 0.5);
+            border: 1px solid var(--terminal-color-dark, #00aa6d);
+            display: none;
+        }
+        .service-status-message.down {
+            display: block;
+            color: #ff0000;
+            background-color: rgba(25, 0, 0, 0.5);
+            border-color: #ff0000;
+            padding: 15px;
+            margin-top: 20px;
+            animation: pulse 2s infinite;
+        }
+        .service-status-countdown {
+            display: block;
+            margin-top: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .retry-message {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        .permanent-message {
+            display: block;
+            margin-top: 15px;
+            font-size: 1em;
+            color: #ff6b6b;
+            border-top: 1px solid rgba(255, 0, 0, 0.3);
+            padding-top: 10px;
+        }
+        h1.typing-effect {
+            color: var(--terminal-color, #00ff9d) !important;
+            text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
+        }
+        #status-display .mb-2 {
+            color: var(--terminal-color, #00ff9d) !important;
+            text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
+        }
+        #status-text {
+            color: var(--terminal-color, #00ff9d) !important;
+            text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
+        }
+        
+        /* 错误状态下的系统状态样式 */
+        .security-box.error #status-display .mb-2,
+        .security-box.error #status-text {
+            color: #ff0000 !important;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.5) !important;
+        }
+
+        /* -------------------------- 加载动画样式 -------------------------- */
+        #loading-interface {
+            display: none;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .loading-title {
+            color: var(--terminal-color, #00ff9d);
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            text-shadow: 0 0 8px rgba(0, 255, 157, 0.6);
+        }
+        .loading-progress {
+            width: 80%;
+            height: 4px;
+            background-color: rgba(0, 25, 15, 0.8);
+            border: 1px solid var(--terminal-color-dark, #00aa6d);
+            margin: 0 auto 20px;
+            overflow: hidden;
+        }
+        .loading-bar {
+            height: 100%;
+            background-color: var(--terminal-color, #00ff9d);
+            box-shadow: 0 0 10px rgba(0, 255, 157, 0.8);
+            width: 0%;
+            transition: width 0.3s linear;
+        }
+        .loading-text {
+            color: var(--terminal-color-dark, #00aa6d);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .loading-steps {
+            color: #aaaaaa;
+            font-size: 0.8rem;
+            margin-top: 20px;
+            opacity: 0.8;
+        }
+
+        /* 主题颜色变量定义 */
+        :root {
+            --terminal-color: #00ff9d;
+            --terminal-color-dark: #00aa6d;
+            --terminal-color-light: rgba(0, 255, 157, 0.5);
+        }
+        
+        /* 蓝色主题 */
+        .theme-blue {
+            --terminal-color: #00aaff;
+            --terminal-color-dark: #0077aa;
+            --terminal-color-light: rgba(0, 170, 255, 0.5);
+        }
+        
+        /* 红色主题 */
+        .theme-red {
+            --terminal-color: #ff3333;
+            --terminal-color-dark: #aa0000;
+            --terminal-color-light: rgba(255, 51, 51, 0.5);
+        }
+        
+        /* 紫色主题 */
+        .theme-purple {
+            --terminal-color: #aa00ff;
+            --terminal-color-dark: #7700aa;
+            --terminal-color-light: rgba(170, 0, 255, 0.5);
+        }
+        
+        /* 黄色主题 */
+        .theme-yellow {
+            --terminal-color: #ffff00;
+            --terminal-color-dark: #aaaa00;
+            --terminal-color-light: rgba(255, 255, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="portal-container d-flex align-items-center justify-content-center">
+        <div class="hex-bg"></div>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div class="login-container">
+                        <div class="security-box">
+                            <div class="scanner"></div>
+                            
+                            <!-- 登录界面 -->
+                            <div id="login-interface">
+                                <h1 class="text-center mb-4 typing-effect">BKV TERMINAL</h1>
+                                <p class="text-center mb-4 subtitle">Verification System // Authorized Entry Only</p>
+                                <div class="mb-4" id="status-display">
+                                    <p class="mb-2">SYSTEM STATUS: <span id="status-text">INITIALIZING...</span></p>
+                                    <div class="progress" style="height: 2px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <!-- 服务时间提示框 -->
+                                <div id="service-status-message" class="service-status-message">
+                                    <div>SERVICE UNAVAILABLE</div>
+                                    <div class="permanent-message">
+                                        Terminal is only accessible between <span class="terminal-color-green">09:00 - 17:00</span><br>
+                                        Please try again during operating hours.
+                                    </div>
+                                </div>
+                                <!-- 登录表单 -->
+                                <form id="login-form">
+                                    <div class="mb-3">
+                                        <label for="access-code" class="form-label">ACCESS CODE</label>
+                                        <input type="password" class="form-control bg-dark text-light border-success" id="access-code" placeholder="Enter access code">
+                                    </div>
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-success w-50" id="authenticate-btn">AUTHENTICATE</button>
+                                    </div>
+                                </form>
+                                <!-- 错误提示 -->
+                                <div class="access-denied" style="display: none;">
+                                    <h2>ACCESS DENIED</h2>
+                                    <p>Invalid access code. System locked temporarily.</p>
+                                </div>
+                                <div class="countdown mt-3" id="countdown"></div>
+                            </div>
+
+                            <!-- 加载动画界面 -->
+                            <div id="loading-interface">
+                                <h2 class="loading-title">LOADING TERMINAL</h2>
+                                <div class="loading-progress">
+                                    <div class="loading-bar" id="loading-bar"></div>
+                                </div>
+                                <p class="loading-text" id="loading-text">Initializing system components...</p>
+                                <p class="loading-steps" id="loading-steps">Connecting to BKV Server [●●●●●●●●●●]</p>
+                            </div>
+
+                        </div>
+                    </div>
+                    
+                    <!-- 终端界面 -->
+                    <div id="terminal-interface" class="terminal-container">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="terminal-color-green">BKV TERMINAL v1.1</span>
+                            <button class="btn btn-danger btn-sm" id="lock-button">LOCK</button>
+                        </div>
+                        <div class="terminal">
+                            <div id="terminal-output"></div>
+                            <div class="terminal-input-line">
+                                <span class="prompt">❯</span>
+                                <input type="text" class="terminal-input" id="terminal-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 核心配置
+        const CONFIG = {
+            FIXED_ACCESS_CODE: '0oll',
+            OPEN_HOUR: 9,
+            CLOSE_HOUR: 17
+        };
+
+        // 摩斯密码映射表
+        const MORSE_CODE_MAP = {
+            'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.', 
+            'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..', 
+            'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.', 
+            'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-', 
+            'Y': '-.--', 'Z': '--..', '0': '-----', '1': '.----', '2': '..---', 
+            '3': '...--', '4': '....-', '5': '.....', '6': '-....', '7': '--...', 
+            '8': '---..', '9': '----.', '.': '.-.-.-', ',': '--..--', '?': '..--..', 
+            "'": '.----.', '!': '-.-.--', '/': '-..-.', '(': '-.--.', ')': '-.--.-', 
+            '&': '.-...', ':': '---...', ';': '-.-.-.', '=': '-...-', '+': '.-.-.', 
+            '-': '-....-', '_': '..--.-', '"': '.-..-.', '$': '...-..-', '@': '.--.-.',
+            ' ': '/'
+        };
+
+        // 反向映射表（用于解密）
+        const REVERSE_MORSE_MAP = {};
+        for (const [char, code] of Object.entries(MORSE_CODE_MAP)) {
+            REVERSE_MORSE_MAP[code] = char;
+        }
+
+        // 初始化日志系统
+        function initLogs() {
+            if (!localStorage.getItem('terminalLogs')) {
+                localStorage.setItem('terminalLogs', JSON.stringify([]));
+            }
+        }
+
+        // 添加日志记录
+        function addLog(action) {
+            try {
+                const logs = JSON.parse(localStorage.getItem('terminalLogs') || '[]');
+                const timestamp = new Date().toISOString().replace('T', ' ').split('.')[0];
+                logs.push({
+                    timestamp,
+                    action
+                });
+                // 限制日志数量为100条
+                if (logs.length > 100) {
+                    logs.shift();
+                }
+                localStorage.setItem('terminalLogs', JSON.stringify(logs));
+            } catch (e) {
+                console.error('Failed to save log:', e);
+            }
+        }
+
+        // 获取日志记录
+        function getLogs() {
+            try {
+                return JSON.parse(localStorage.getItem('terminalLogs') || '[]');
+            } catch (e) {
+                console.error('Failed to get logs:', e);
+                return [];
+            }
+        }
+
+        // DOM加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化日志系统
+            initLogs();
+            
+            // DOM元素获取
+            const progressBar = document.querySelector('.progress-bar');
+            const statusText = document.getElementById('status-text');
+            const loginForm = document.getElementById('login-form');
+            const accessInput = document.getElementById('access-code');
+            const submitButton = document.getElementById('authenticate-btn');
+            const countdownElement = document.getElementById('countdown');
+            const securityBox = document.querySelector('.security-box');
+            const loginInterface = document.getElementById('login-interface');
+            const loadingInterface = document.getElementById('loading-interface');
+            const terminalInterface = document.getElementById('terminal-interface');
+            const terminalOutput = document.getElementById('terminal-output');
+            const terminalInput = document.getElementById('terminal-input');
+            const serviceStatusMessage = document.getElementById('service-status-message');
+            const accessDeniedBox = document.querySelector('.access-denied');
+            const lockButton = document.getElementById('lock-button');
+            const loadingBar = document.getElementById('loading-bar');
+            const loadingText = document.getElementById('loading-text');
+            const loadingSteps = document.getElementById('loading-steps');
+            const htmlElement = document.documentElement;
+
+            // 检查服务时间
+            let isServiceAvailable = false;
+            function checkServiceTime() {
+                const now = new Date();
+                const currentHour = now.getHours();
+                isServiceAvailable = currentHour >= CONFIG.OPEN_HOUR && currentHour < CONFIG.CLOSE_HOUR;
+                return isServiceAvailable;
+            }
+
+            // 更新进度
+            let progress = 0;
+            function updateProgress() {
+                progress += 33;
+                if (progress > 100) progress = 100;
+                progressBar.style.width = progress + '%';
+                if (progress >= 99) {
+                    if (checkServiceTime()) {
+                        statusText.textContent = 'READY';
+                        statusText.classList.remove('status-down');
+                        progressBar.className = 'progress-bar bg-success';
+                        loginForm.style.display = 'block';
+                        serviceStatusMessage.style.display = 'none';
+                        accessInput.focus();
+                    } else {
+                        statusText.textContent = 'DOWN';
+                        statusText.classList.add('status-down');
+                        progressBar.className = 'progress-bar bg-danger';
+                        loginForm.style.display = 'none';
+                        serviceStatusMessage.classList.add('down');
+                        serviceStatusMessage.style.display = 'block';
+                    }
+                }
+                if (progress < 100) {
+                    setTimeout(updateProgress, 100);
+                }
+            }
+
+            // 锁定功能
+            const LOCK_DURATION = 60;
+            let isLocked = false;
+            function setLockoutTime() {
+                try {
+                    const lockoutExpires = Date.now() + LOCK_DURATION * 1000;
+                    localStorage.setItem('lockoutExpires', lockoutExpires.toString());
+                    addLog('登录尝试 - 失败（密码错误）');
+                } catch (e) {
+                    console.error('Storage error:', e);
+                }
+            }
+
+            function clearLockout() {
+                try {
+                    localStorage.removeItem('lockoutExpires');
+                    isLocked = false;
+                } catch (e) {
+                    console.error('Storage error:', e);
+                }
+            }
+
+            function checkLockoutStatus() {
+                try {
+                    const lockoutExpires = localStorage.getItem('lockoutExpires');
+                    if (lockoutExpires) {
+                        const now = Date.now();
+                        if (now < parseInt(lockoutExpires)) {
+                            const timeLeft = Math.floor((parseInt(lockoutExpires) - now) / 1000);
+                            startCountdown(timeLeft);
+                            return true;
+                        } else {
+                            clearLockout();
+                            return false;
+                        }
+                    }
+                    return false;
+                } catch (e) {
+                    console.error('Storage error:', e);
+                    return false;
+                }
+            }
+
+            function startCountdown(timeLeft = LOCK_DURATION) {
+                isLocked = true;
+                let secondsLeft = timeLeft;
+                securityBox.classList.add('error');
+                countdownElement.style.display = 'block';
+                accessDeniedBox.style.display = 'block';
+                accessInput.disabled = true;
+                submitButton.disabled = true;
+                const countdownInterval = setInterval(() => {
+                    countdownElement.textContent = `SYSTEM LOCKED: ${secondsLeft}s`;
+                    secondsLeft--;
+                    if (secondsLeft < 0) {
+                        clearInterval(countdownInterval);
+                        securityBox.classList.remove('error');
+                        countdownElement.style.display = 'none';
+                        accessDeniedBox.style.display = 'none';
+                        clearLockout();
+                        if (checkServiceTime()) {
+                            accessInput.disabled = false;
+                            submitButton.disabled = false;
+                            accessInput.value = '';
+                            accessInput.focus();
+                        }
+                    }
+                }, 1000);
+            }
+
+            // 加载动画
+            function startLoadingAnimation() {
+                loginInterface.style.display = 'none';
+                loadingInterface.style.display = 'block';
+                document.querySelector('.scanner').style.display = 'none';
+                
+                const randomLoadTime = Math.floor(Math.random() * 2000) + 1000;
+                const startTime = Date.now();
+                const endTime = startTime + randomLoadTime;
+
+                const loadInterval = setInterval(() => {
+                    const currentTime = Date.now();
+                    const elapsedTime = currentTime - startTime;
+                    const progressPercent = Math.min(100, Math.floor((elapsedTime / randomLoadTime) * 100));
+                    
+                    loadingBar.style.width = progressPercent + '%';
+
+                    if (progressPercent < 30) {
+                        loadingText.textContent = 'Initializing system components...';
+                        loadingSteps.textContent = 'Connecting to BKV Server [●●●●●●●●●●]';
+                    } else if (progressPercent < 60) {
+                        loadingText.textContent = 'Verifying authorization credentials...';
+                        loadingSteps.textContent = 'Encrypting data channel [●●●●●●●●●●]';
+                    } else if (progressPercent < 90) {
+                        loadingText.textContent = 'Loading terminal interface...';
+                        loadingSteps.textContent = 'Syncing system logs [●●●●●●●●●●]';
+                    } else {
+                        loadingText.textContent = 'Terminal ready. Redirecting...';
+                        loadingSteps.textContent = 'All systems operational [●●●●●●●●●●]';
+                    }
+
+                    if (progressPercent >= 100) {
+                        clearInterval(loadInterval);
+                        setTimeout(() => {
+                            loadingInterface.style.display = 'none';
+                            switchToTerminal();
+                            addTerminalLine('Access granted. Terminal activated.', false);
+                            addTerminalLine('Type "help" for available commands.', false);
+                            addLog('登录尝试 - 成功');
+                        }, 300);
+                    }
+                }, 50);
+            }
+
+            // 登录表单提交
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (isLocked || !checkServiceTime()) return;
+                const inputCode = accessInput.value.trim();
+                
+                if (inputCode === CONFIG.FIXED_ACCESS_CODE) {
+                    startLoadingAnimation();
+                } else {
+                    setLockoutTime();
+                    startCountdown();
+                }
+            });
+
+            // 终端功能
+            function switchToTerminal() {
+                terminalInterface.style.display = 'block';
+                terminalInput.focus();
+            }
+
+            function addTerminalLine(text, isCommand = false) {
+                const line = document.createElement('div');
+                line.className = 'terminal-line';
+                if (isCommand) {
+                    line.innerHTML = `<span style="color: var(--terminal-color);"> >> ${text}</span>`;
+                } else {
+                    line.textContent = text;
+                }
+                terminalOutput.appendChild(line);
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+
+            // 地区检测功能
+            function getLocation() {
+                addTerminalLine('Attempting to retrieve location data...', false);
+                
+                if (!navigator.geolocation) {
+                    addTerminalLine('Error: Geolocation is not supported by your browser', false);
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        
+                        // 模拟IP信息（实际项目中可对接IP查询API）
+                        const mockIp = `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+                        
+                        // 这里使用逆地理编码API获取位置信息（实际使用时需要申请API密钥）
+                        // 为了演示，我们使用模拟数据
+                        addTerminalLine(`IP: ${mockIp} (simulated)`, false);
+                        addTerminalLine(`Coordinates: Lat ${latitude.toFixed(4)}, Lon ${longitude.toFixed(4)}`, false);
+                        addTerminalLine(`Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`, false);
+                        addTerminalLine(`Current time: ${new Date().toLocaleString()}`, false);
+                        addTerminalLine('Note: Location data is approximate', false);
+                    },
+                    (error) => {
+                        let errorMsg = 'Error retrieving location: ';
+                        switch(error.code) {
+                            case 1:
+                                errorMsg += 'Permission denied';
+                                break;
+                            case 2:
+                                errorMsg += 'Position unavailable';
+                                break;
+                            case 3:
+                                errorMsg += 'Timeout';
+                                break;
+                            default:
+                                errorMsg += 'Unknown error';
+                        }
+                        addTerminalLine(errorMsg, false);
+                    }
+                );
+            }
+
+            // 系统信息功能
+            function getSystemInfo() {
+                const userAgent = navigator.userAgent;
+                const browserInfo = /(Chrome|Firefox|Safari|Edge|Opera)\/([\d.]+)/.exec(userAgent) || ['Unknown', 'Unknown'];
+                const osInfo = /(Windows|Macintosh|Linux|Android|iOS)/.exec(userAgent) || ['Unknown OS'];
+                
+                // 模拟系统资源使用情况
+                const cpuUsage = Math.floor(Math.random() * 50) + 10; // 10-60%
+                const memoryUsage = (Math.random() * 4 + 0.5).toFixed(1); // 0.5-4.5GB
+                const totalMemory = 8; // 模拟总内存8GB
+                
+                addTerminalLine(`Terminal Version: v1.1`, false);
+                addTerminalLine(`Browser: ${browserInfo[1]} ${browserInfo[2]}`, false);
+                addTerminalLine(`OS: ${osInfo[1]}`, false);
+                addTerminalLine(`CPU Usage: ${cpuUsage}%`, false);
+                addTerminalLine(`Memory: ${memoryUsage}GB/${totalMemory}GB`, false);
+                addTerminalLine(`Screen: ${window.screen.width}x${window.screen.height}px`, false);
+                addTerminalLine(`Last Login: ${new Date().toLocaleString()}`, false);
+            }
+
+            // 主题切换功能
+            function changeTheme(theme) {
+                // 移除所有主题类
+                htmlElement.classList.remove('theme-blue', 'theme-red', 'theme-purple', 'theme-yellow');
+                
+                // 应用新主题
+                if (theme && ['blue', 'red', 'purple', 'yellow'].includes(theme)) {
+                    htmlElement.classList.add(`theme-${theme}`);
+                    addTerminalLine(`Theme changed to: ${theme}`, false);
+                    localStorage.setItem('terminalTheme', theme);
+                    return;
+                }
+                
+                // 显示可用主题
+                addTerminalLine('Available themes:', false);
+                addTerminalLine('  default (green) | blue | red | purple | yellow', false);
+                addTerminalLine('Usage: theme [theme-name]', false);
+            }
+
+            // 摩斯密码转换功能
+            function morseCodeConvert(input) {
+                if (!input) {
+                    addTerminalLine('Usage:', false);
+                    addTerminalLine('  To encrypt: morse [text]', false);
+                    addTerminalLine('  To decrypt: morse -d [morse-code]', false);
+                    return;
+                }
+                
+                // 检查是否为解密模式
+                const parts = input.split(' ');
+                let isDecrypt = false;
+                let text = input;
+                
+                if (parts[0] === '-d' && parts.length > 1) {
+                    isDecrypt = true;
+                    text = parts.slice(1).join(' ');
+                }
+                
+                if (isDecrypt) {
+                    // 解密摩斯码
+                    const words = text.split('  '); // 单词之间用两个空格分隔
+                    let result = '';
+                    
+                    for (const word of words) {
+                        const letters = word.split(' ');
+                        for (const letter of letters) {
+                            result += REVERSE_MORSE_MAP[letter] || '?';
+                        }
+                        result += ' ';
+                    }
+                    
+                    addTerminalLine(`Decrypted: ${result.trim()}`, false);
+                } else {
+                    // 加密为摩斯码
+                    let result = '';
+                    const upperText = text.toUpperCase();
+                    
+                    for (const char of upperText) {
+                        if (MORSE_CODE_MAP[char]) {
+                            result += MORSE_CODE_MAP[char] + ' ';
+                        } else {
+                            result += '? '; // 未知字符用?表示
+                        }
+                    }
+                    
+                    addTerminalLine(`Encrypted: ${result.trim()}`, false);
+                }
+            }
+
+            // 计算器功能
+            function calculate(expression) {
+                if (!expression) {
+                    addTerminalLine('Usage: calc [expression]', false);
+                    addTerminalLine('Supports: +, -, *, /, (, )', false);
+                    addTerminalLine('Example: calc 2+3*4', false);
+                    return;
+                }
+                
+                try {
+                    // 使用更安全的计算方式替代eval
+                    // 仅允许数字和四则运算符
+                    if (!/^[\d+\-*/().\s]+$/.test(expression)) {
+                        throw new Error('Invalid characters in expression');
+                    }
+                    
+                    // 简单的表达式计算
+                    const result = new Function(`return ${expression};`)();
+                    
+                    // 检查结果是否为数字
+                    if (isNaN(result) || !isFinite(result)) {
+                        throw new Error('Invalid calculation result');
+                    }
+                    
+                    addTerminalLine(`${expression} = ${result}`, false);
+                } catch (error) {
+                    addTerminalLine(`Error: ${error.message}`, false);
+                }
+            }
+
+            // 处理终端命令
+            function handleTerminalCommand(command) {
+                const cmdParts = command.toLowerCase().trim().split(' ');
+                const mainCmd = cmdParts[0];
+                const args = cmdParts.slice(1).join(' ');
+                
+                // 记录命令日志
+                addLog(`执行指令: ${command}`);
+                
+                switch (mainCmd) {
+                    case 'clear':
+                        terminalOutput.innerHTML = '';
+                        break;
+                    case 'date':
+                        addTerminalLine(`Current time: ${new Date().toLocaleString()}`, false);
+                        break;
+                    case 'help':
+                        addTerminalLine('Available commands:', false);
+                        addTerminalLine('  clear        - Clear terminal output', false);
+                        addTerminalLine('  date         - Show current date/time', false);
+                        addTerminalLine('  exit         - Return to login screen', false);
+                        addTerminalLine('  help         - Show this help message', false);
+                        addTerminalLine('  location     - Show geolocation information', false);
+                        addTerminalLine('  sysinfo      - Show system information', false);
+                        addTerminalLine('  logs         - Show command history logs', false);
+                        addTerminalLine('  theme        - Change terminal theme (blue/red/purple/yellow)', false);
+                        addTerminalLine('  morse        - Convert text to/from Morse code', false);
+                        addTerminalLine('  calc         - Simple calculator (supports +, -, *, /)', false);
+                        break;
+                    case 'exit':
+                        location.reload();
+                        break;
+                    case 'location':
+                        getLocation();
+                        break;
+                    case 'sysinfo':
+                        getSystemInfo();
+                        break;
+                    case 'logs':
+                        const logs = getLogs();
+                        if (logs.length === 0) {
+                            addTerminalLine('No logs available', false);
+                        } else {
+                            addTerminalLine(`Recent logs (${logs.length}):`, false);
+                            // 只显示最近10条日志
+                            const recentLogs = logs.slice(-10);
+                            recentLogs.forEach(log => {
+                                addTerminalLine(`[${log.timestamp}] ${log.action}`, false);
+                            });
+                        }
+                        break;
+                    case 'theme':
+                        changeTheme(args);
+                        break;
+                    case 'morse':
+                        morseCodeConvert(args);
+                        break;
+                    case 'calc':
+                        calculate(args);
+                        break;
+                    default:
+                        addTerminalLine(`Command not found: ${command}`, false);
+                        addTerminalLine('Type "help" for available commands.', false);
+                        break;
+                }
+            }
+
+            // 终端输入处理
+            terminalInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const command = terminalInput.value.trim();
+                    if (command) {
+                        addTerminalLine(command, true);
+                        handleTerminalCommand(command);
+                    }
+                    terminalInput.value = '';
+                }
+            });
+
+            // 锁定按钮
+            lockButton.addEventListener('click', function() {
+                addLog('Manual logout');
+                location.reload();
+            });
+
+            // 生成十六进制背景
+            function generateHexBackground() {
+                const hexChars = '0123456789ABCDEF';
+                const hexBg = document.querySelector('.hex-bg');
+                let hexText = '';
+                for (let i = 0; i < 5000; i++) {
+                    hexText += hexChars[Math.floor(Math.random() * 16)];
+                    if (i % 50 === 0) hexText += '\n';
+                }
+                hexBg.textContent = hexText;
+            }
+
+            // 加载保存的主题
+            function loadSavedTheme() {
+                const savedTheme = localStorage.getItem('terminalTheme');
+                if (savedTheme) {
+                    changeTheme(savedTheme);
+                }
+            }
+
+            // 初始化
+            generateHexBackground();
+            updateProgress();
+            checkLockoutStatus();
+            loadSavedTheme();
+            
+            // 点击终端区域聚焦输入框
+            document.querySelector('.terminal-container').addEventListener('click', function(e) {
+                if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
+                    terminalInput.focus();
+                }
+            });
+        });
+    </script>
+    <!-- 终端自定义光标 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const terminalInput = document.getElementById('terminal-input');
+            if (!terminalInput) return;
+            const customCursor = document.createElement('span');
+            customCursor.textContent = '_';
+            customCursor.style.display = 'none';
+            customCursor.style.position = 'absolute';
+            customCursor.style.pointerEvents = 'none';
+            customCursor.style.animation = 'blink 1s step-end infinite';
+            document.body.appendChild(customCursor);
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes blink {
+                    50% { opacity: 0; }
+                }
+                #terminal-input {
+                    color: transparent !important;
+                    text-shadow: 0 0 0 var(--terminal-color) !important;
+                    caret-color: transparent !important;
+                }
+            `;
+            document.head.appendChild(style);
+            function updateCursorPosition() {
+                if (!terminalInput || terminalInterface.style.display !== 'block') {
+                    customCursor.style.display = 'none';
+                    return;
+                }
+                const inputRect = terminalInput.getBoundingClientRect();
+                const lineRect = terminalInput.parentElement.getBoundingClientRect();
+                const span = document.createElement('span');
+                span.style.font = window.getComputedStyle(terminalInput).font;
+                span.style.position = 'absolute';
+                span.style.visibility = 'hidden';
+                span.style.whiteSpace = 'pre';
+                span.textContent = terminalInput.value.substring(0, terminalInput.selectionStart);
+                document.body.appendChild(span);
+                let cursorLeft = inputRect.left + span.offsetWidth;
+                const maxWidth = lineRect.right - 20;
+                if (cursorLeft > maxWidth) {
+                    const overflow = cursorLeft - maxWidth;
+                    terminalInput.scrollLeft += overflow;
+                    cursorLeft = maxWidth;
+                }
+                customCursor.style.display = 'inline-block';
+                customCursor.style.left = cursorLeft + 'px';
+                customCursor.style.top = inputRect.top + 'px';
+                customCursor.style.height = inputRect.height + 'px';
+                customCursor.style.lineHeight = inputRect.height + 'px';
+                customCursor.style.color = getComputedStyle(document.documentElement).getPropertyValue('--terminal-color');
+                document.body.removeChild(span);
+            }
+            terminalInput.addEventListener('input', updateCursorPosition);
+            terminalInput.addEventListener('click', updateCursorPosition);
+            terminalInput.addEventListener('keyup', updateCursorPosition);
+            terminalInput.addEventListener('keydown', updateCursorPosition);
+            terminalInput.addEventListener('focus', updateCursorPosition);
+            terminalInput.addEventListener('blur', () => customCursor.style.display = 'none');
+            window.addEventListener('resize', updateCursorPosition);
+            const terminalInterface = document.getElementById('terminal-interface');
+            if (terminalInterface) {
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.target.id === 'terminal-interface' && mutation.attributeName === 'style') {
+                            updateCursorPosition();
+                        }
+                    });
+                });
+                observer.observe(terminalInterface, { attributes: true });
+            }
+        });
+    </script>
+        <!-- 输入框聚焦 -->
+    <script src="https://bkv.me/js/focus.js?v=1"></script>
+
+
+    <!-- 自动滚动 -->
+    <script src="https://bkv.me/js/terminal-scroll.js?v=1"></script>
+</body>
+</html>
